@@ -31,10 +31,12 @@ public class Movement : NetworkBehaviour
 
     void Update()
     {
+        if(!IsOwner) return;
         staminaCurrent += staminaRefreshRate * Time.deltaTime;
         if(Input.GetKey(KeyCode.LeftShift)) staminaCurrent -= staminaUsageRate * Time.deltaTime;
         staminaCurrent = Mathf.Clamp(staminaCurrent, 0, staminaBase);
 
+        if(!IsOwner) return;
         GroundMovement();
         
     }
