@@ -1337,3 +1337,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startHostButton: {fileID: 114255795}
   startClientButton: {fileID: 953504226}
+  camera: {fileID: 330585543}

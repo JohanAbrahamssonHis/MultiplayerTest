@@ -9,6 +9,7 @@ public class NetCodeUI : MonoBehaviour
 {
     public Button startHostButton;
     public Button startClientButton;
+    public GameObject camera;
 
 
     private void Awake()
@@ -29,6 +30,7 @@ public class NetCodeUI : MonoBehaviour
 
     private void Hide()
     {
+        camera.SetActive(false);
         gameObject.SetActive(false);
     }
 }
