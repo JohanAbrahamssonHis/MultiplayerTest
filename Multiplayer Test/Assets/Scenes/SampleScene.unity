@@ -826,6 +826,8 @@ GameObject:
   - component: {fileID: 1046167036}
   - component: {fileID: 1046167035}
   - component: {fileID: 1046167034}
+  - component: {fileID: 1046167037}
+  - component: {fileID: 1046167038}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -840,7 +842,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1046167033}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
@@ -876,7 +878,7 @@ MonoBehaviour:
   LogLevel: 1
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 1046167034}
+    NetworkTransport: {fileID: 1046167038}
     PlayerPrefab: {fileID: 7993109372863106893, guid: bf0d8d43839a0404bab33d893f40dc72,
       type: 3}
     Prefabs:
@@ -913,6 +915,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1046167037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046167033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d49931ed71b87854d96c61e958192d3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkManager: {fileID: 1046167035}
+  steamP2PTransport: {fileID: 1046167038}
+--- !u!114 &1046167038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046167033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1b4989be7694b4c82438faf5c1843c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1180562726
 GameObject:
   m_ObjectHideFlags: 0

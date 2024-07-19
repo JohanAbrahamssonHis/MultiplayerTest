@@ -45,6 +45,9 @@ public class SteamManager : MonoBehaviour {
 
 	protected SteamAPIWarningMessageHook_t m_SteamAPIWarningMessageHook;
 
+	private Callback<P2PSessionRequest_t> _p2pSessionRequestCallback;
+	private Callback<P2PSessionConnectFail_t> _p2pSessionConnectFailCallback;
+	
 	[AOT.MonoPInvokeCallback(typeof(SteamAPIWarningMessageHook_t))]
 	protected static void SteamAPIDebugTextHook(int nSeverity, System.Text.StringBuilder pchDebugText) {
 		Debug.LogWarning(pchDebugText);
@@ -123,6 +126,9 @@ public class SteamManager : MonoBehaviour {
 		}
 
 		s_EverInitialized = true;
+		
+		_p2pSessionRequestCallback = Callback<P2PSessionRequest_t>.Create(OnP2PSessionRequest);
+		_p2pSessionConnectFailCallback = Callback<P2PSessionConnectFail_t>.Create(OnP2PSessionConnectFail);
 	}
 
 	// This should only ever get called on first load and after an Assembly reload, You should never Disable the Steamworks Manager yourself.
@@ -141,6 +147,18 @@ public class SteamManager : MonoBehaviour {
 			m_SteamAPIWarningMessageHook = new SteamAPIWarningMessageHook_t(SteamAPIDebugTextHook);
 			SteamClient.SetWarningMessageHook(m_SteamAPIWarningMessageHook);
 		}
+	}
+	
+	private void OnP2PSessionRequest(P2PSessionRequest_t request)
+	{
+		// Accept connection request
+		SteamNetworking.AcceptP2PSessionWithUser(request.m_steamIDRemote);
+	}
+
+	private void OnP2PSessionConnectFail(P2PSessionConnectFail_t failure)
+	{
+		// Handle connection failure
+		Debug.LogError("P2P Session Connect Failed: " + failure.m_eP2PSessionError);
 	}
 
 	// OnApplicationQuit gets called too early to shutdown the SteamAPI.
