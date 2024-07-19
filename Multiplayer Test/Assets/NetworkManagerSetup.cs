@@ -14,7 +14,5 @@ public class NetworkManagerSetup : MonoBehaviour
 
         // Start the server or client based on your requirement
         //networkManager.StartServer(); // or networkManager.StartClient();
-        
-        networkManager.NetworkConfig
     }
 }
