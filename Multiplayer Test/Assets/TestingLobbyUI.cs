@@ -16,7 +16,7 @@ public class TestingLobbyUI : MonoBehaviour
         createGameButton.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartHost();
-            LoadNetWork("SampleScene");
+            LoadNetWork("Character Select Scene");
         });
         joinGameButton.onClick.AddListener(() =>
         {
