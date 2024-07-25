@@ -1,9 +1,18 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using Steamworks;
 
 public class SteamScript : MonoBehaviour {
     private CallResult<NumberOfCurrentPlayers_t> m_NumberOfCurrentPlayers;
+
+    private void Awake()
+    {
+        if (SteamManager.Initialized)
+        {
+            Debug.Log(SteamFriends.GetPersonaName());
+        }
+    }
 
     private void OnEnable() {
         if (SteamManager.Initialized) {

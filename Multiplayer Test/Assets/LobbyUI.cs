@@ -15,6 +15,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private Button quickJoinButton;
     [SerializeField] private Button joinCodeButton;
     [SerializeField] private TMP_InputField joinCodeInputField;
+    [SerializeField] private TMP_InputField playerNameInputField;
     [SerializeField] private LobbyCreateUI _lobbyCreateUI;
     
 
@@ -41,5 +42,14 @@ public class LobbyUI : MonoBehaviour
     public static void LoadNetWork(string targetScene)
     {
         NetworkManager.Singleton.SceneManager.LoadScene(targetScene, LoadSceneMode.Single);
+    }
+
+    private void Start()
+    {
+        playerNameInputField.text = GeneralManager.Instance.GetPlayername();
+        playerNameInputField.onValueChanged.AddListener((string newText) =>
+        {
+            GeneralManager.Instance.SetPlayername(newText);
+        });
     }
 }

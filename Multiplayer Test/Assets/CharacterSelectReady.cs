@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -42,5 +43,10 @@ public class CharacterSelectReady : NetworkBehaviour
         {
             NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
         }
+    }
+
+    public List<bool> GetPlayersReady()
+    {
+        return playerReadyDictionary.Values.ToList();
     }
 }
