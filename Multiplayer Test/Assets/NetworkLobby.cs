@@ -14,6 +14,9 @@ public class NetworkLobby : MonoBehaviour
     public static NetworkLobby Instance { get; private set; }
 
     private Lobby joinedLobby;
+
+    private float heartbeatTimer;
+    
     private void Awake()
     {
         Instance = this;
@@ -21,6 +24,31 @@ public class NetworkLobby : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         
         InitializeUnityAuthentication();
+    }
+
+    private void Update()
+    {
+        HandleHeatbeat();
+    }
+
+    private void HandleHeatbeat()
+    {
+        if (IsLobbyHost())
+        {
+            heartbeatTimer -= Time.deltaTime;
+            if (heartbeatTimer <= 0f)
+            {
+                float heartBeatTimerMax = 15f;
+                heartbeatTimer = heartBeatTimerMax;
+
+                LobbyService.Instance.SendHeartbeatPingAsync(joinedLobby.Id);
+            }
+        }
+    }
+
+    private bool IsLobbyHost()
+    {
+        return joinedLobby != null && joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
     }
 
     private async void InitializeUnityAuthentication()
@@ -67,5 +95,24 @@ public class NetworkLobby : MonoBehaviour
             Debug.Log(e);
             throw;
         }
+    }
+
+    public async void JoinWithCode(string lobbyCode)
+    {
+        try
+        {
+            joinedLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
+            NetworkManager.Singleton.StartClient();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            throw;
+        }
+    }
+
+    public Lobby GetLobby()
+    {
+        return joinedLobby;
     }
 }
