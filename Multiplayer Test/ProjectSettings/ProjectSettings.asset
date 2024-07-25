@@ -885,11 +885,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: d32502d5-e0f4-4fcb-ba44-5c88dff67994
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Multiplayer Test
+  organizationId: johanabrahamsson
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
