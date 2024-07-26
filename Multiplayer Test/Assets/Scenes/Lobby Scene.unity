@@ -2226,6 +2226,7 @@ GameObject:
   m_Component:
   - component: {fileID: 831813152}
   - component: {fileID: 831813153}
+  - component: {fileID: 831813154}
   m_Layer: 0
   m_Name: General Manager
   m_TagString: Untagged
@@ -2260,6 +2261,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab23e2410bdf27146aa2672a90b51888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &831813154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831813149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2569253381
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &856977113
 GameObject:
   m_ObjectHideFlags: 0

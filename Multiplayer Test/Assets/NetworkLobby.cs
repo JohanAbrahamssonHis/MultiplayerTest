@@ -73,7 +73,7 @@ public class NetworkLobby : MonoBehaviour
                 IsPrivate = isPrivate,
             });
             
-            NetworkManager.Singleton.StartHost();
+            GeneralManager.Instance.StartHost();
             TestingLobbyUI.LoadNetWork("Character Select Scene");
         }
         catch (Exception e)
@@ -88,7 +88,7 @@ public class NetworkLobby : MonoBehaviour
         try
         {
             joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
-            NetworkManager.Singleton.StartClient();
+            GeneralManager.Instance.StartClient();
         }
         catch (Exception e)
         {
@@ -102,7 +102,7 @@ public class NetworkLobby : MonoBehaviour
         try
         {
             joinedLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
-            NetworkManager.Singleton.StartClient();
+            GeneralManager.Instance.StartClient();
         }
         catch (Exception e)
         {
