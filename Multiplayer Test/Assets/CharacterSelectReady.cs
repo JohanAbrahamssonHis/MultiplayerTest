@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 public class CharacterSelectReady : NetworkBehaviour
 {
     public static CharacterSelectReady Instance { get; private set; }
-    
+
+    public event EventHandler OnReadyChange;
     private Dictionary<ulong, bool> playerReadyDictionary;
 
     private void Awake()
@@ -26,6 +27,7 @@ public class CharacterSelectReady : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
     {
+        SetPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId);
         playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
 
         bool allClientsReady = true;
@@ -45,8 +47,21 @@ public class CharacterSelectReady : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void SetPlayerReadyClientRpc(ulong clientId)
+    {
+        playerReadyDictionary[clientId] = true;
+        
+        OnReadyChange?.Invoke(this,EventArgs.Empty);
+    }
+
     public List<bool> GetPlayersReady()
     {
         return playerReadyDictionary.Values.ToList();
+    }
+
+    public bool IsPlayerReady(ulong clientId)
+    {
+        return playerReadyDictionary[clientId];
     }
 }

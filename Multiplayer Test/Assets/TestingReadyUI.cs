@@ -22,17 +22,29 @@ public class TestingReadyUI : MonoBehaviour
         }));
     }
 
-    private void Update()
+    private void Start()
+    {
+        CharacterSelectReady.Instance.OnReadyChange += InstanceOnOnReadyChange;
+    }
+
+    private void InstanceOnOnReadyChange(object sender, EventArgs e)
+    {
+        UpdatePlayerReady();
+    }
+
+    private void UpdatePlayerReady()
+    {
+        playerInformationVisualRpc();
+    }
+    
+    private void playerInformationVisualRpc()
     {
         for (int i = 0; i < players.Count; i++)
         {
             players[i].SetActive(i<NetworkManager.Singleton.ConnectedClients.Count);
+            //readyTexts[i].text = CharacterSelectReady.Instance.IsPlayerReady() ? "Ready" : "UnReady";
         }
-        List<bool> playersReady = CharacterSelectReady.Instance.GetPlayersReady();
-        Debug.Log(playersReady.Count);
-        for (int i = 0; i < players.Count(x => x.activeSelf); i++)
-        {
-            readyTexts[i].text = playersReady[i] ? "Ready" : "UnReady";
-        }
+        
+        //5:06
     }
 }
