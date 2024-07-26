@@ -13,12 +13,23 @@ public class NetworkLobby : MonoBehaviour
 {
     public static NetworkLobby Instance { get; private set; }
 
+    public event EventHandler<OnLobbyListChagnedEventArgs> OnLobbyListChanged; 
+    public class OnLobbyListChagnedEventArgs : EventArgs
+    {
+        public List<Lobby> lobbyList;
+    }
+    
     private Lobby joinedLobby;
 
     private float heartbeatTimer;
+    private float listLobbiesTimer;
     
     private void Awake()
     {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
         Instance = this;
         
         DontDestroyOnLoad(gameObject);
@@ -29,6 +40,20 @@ public class NetworkLobby : MonoBehaviour
     private void Update()
     {
         HandleHeatbeat();
+        HandlePeriodicListLobbies();
+    }
+
+    private void HandlePeriodicListLobbies()
+    {
+        if(joinedLobby != null && !AuthenticationService.Instance.IsSignedIn) return;
+        listLobbiesTimer -= Time.deltaTime;
+        if (listLobbiesTimer <= 0f)
+        {
+            float listLobbiesTimerMax = 3f;
+            listLobbiesTimer = listLobbiesTimerMax;
+            ListLobbies();
+        }
+            
     }
 
     private void HandleHeatbeat()
@@ -49,6 +74,31 @@ public class NetworkLobby : MonoBehaviour
     private bool IsLobbyHost()
     {
         return joinedLobby != null && joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
+    }
+
+    private  async void ListLobbies()
+    {
+        try
+        {
+            QueryLobbiesOptions queryLobbiesOptions = new QueryLobbiesOptions
+            {
+                Filters = new List<QueryFilter>
+                {
+                    new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "0", QueryFilter.OpOptions.GT)
+                }
+            };
+            QueryResponse queryResponse = await LobbyService.Instance.QueryLobbiesAsync(queryLobbiesOptions);
+
+            OnLobbyListChanged?.Invoke(this, new OnLobbyListChagnedEventArgs()
+            {
+                lobbyList = queryResponse.Results
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+
     }
 
     private async void InitializeUnityAuthentication()
@@ -83,6 +133,60 @@ public class NetworkLobby : MonoBehaviour
         }
     }
 
+    public async void DestroyLobby()
+    {
+        if (joinedLobby != null)
+        {
+            try
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+
+                joinedLobby = null;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                throw;
+            }
+        }
+    }
+
+    public async void LeaveLobby()
+    {
+        if (joinedLobby != null)
+        {
+            try
+            {
+                await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId);
+
+                joinedLobby = null;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                throw;
+            }
+        }
+    }
+    
+    public async void KickPlayer(string playerId)
+    {
+        if (IsLobbyHost())
+        {
+            try
+            {
+                await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, playerId);
+
+                joinedLobby = null;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                throw;
+            }
+        }
+    }
+
     public async void QuickJoin()
     {
         try
@@ -97,6 +201,20 @@ public class NetworkLobby : MonoBehaviour
         }
     }
 
+    public async void JoinWithId(string lobbyId)
+    {
+        try
+        {
+            joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            GeneralManager.Instance.StartClient();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            throw;
+        }
+    }
+    
     public async void JoinWithCode(string lobbyCode)
     {
         try

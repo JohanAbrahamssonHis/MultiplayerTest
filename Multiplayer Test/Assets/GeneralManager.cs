@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Steamworks;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 
 public class GeneralManager : NetworkBehaviour
@@ -15,6 +16,10 @@ public class GeneralManager : NetworkBehaviour
     
     private void Awake()
     {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
         Instance = this;
         DontDestroyOnLoad(gameObject);
         playerDataNetworkList = new NetworkList<PlayerData>();
@@ -58,6 +63,7 @@ public class GeneralManager : NetworkBehaviour
     private void SingletonOnOnClientConnectedCallback(ulong clientId)
     {
         SetPlayerNameServerRpc(GetPlayername());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -71,6 +77,18 @@ public class GeneralManager : NetworkBehaviour
 
         playerDataNetworkList[playerDataIndex] = playerData;
     }
+    
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerIdServerRpc(string playerId, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerId = playerId;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
 
     private void NetworkManagerOnClientConnectedCallback(ulong clientId)
     {
@@ -79,6 +97,7 @@ public class GeneralManager : NetworkBehaviour
             clientId = clientId,
         });
         SetPlayerNameServerRpc(GetPlayername());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
     }
 
     public string GetPlayername()

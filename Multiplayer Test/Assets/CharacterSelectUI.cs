@@ -17,6 +17,7 @@ public class CharacterSelectUI : MonoBehaviour
         backButton.onClick.AddListener((() =>
         {
             //NOTE MUST BE ADDED TO WORK WITH A MAIN MENU (AKA LEAVING THE MULTIPLAYER PART)
+            NetworkLobby.Instance.LeaveLobby();
             NetworkManager.Singleton.Shutdown();
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby Scene", LoadSceneMode.Single);
             

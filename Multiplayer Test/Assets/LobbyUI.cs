@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -17,12 +18,15 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private TMP_InputField joinCodeInputField;
     [SerializeField] private TMP_InputField playerNameInputField;
     [SerializeField] private LobbyCreateUI _lobbyCreateUI;
+    [SerializeField] private Transform _lobbyContainter;
+    [SerializeField] private Transform _lobbyTemplate;
     
 
     private void Awake()
     {
         mainMenuButton.onClick.AddListener((() =>
         {
+            NetworkLobby.Instance.LeaveLobby();
             LoadNetWork("Character Select Scene");
         }));
         createLobbyButton.onClick.AddListener((() =>
@@ -37,6 +41,8 @@ public class LobbyUI : MonoBehaviour
         {
             NetworkLobby.Instance.JoinWithCode(joinCodeInputField.text);
         }));
+        
+        _lobbyTemplate.gameObject.SetActive(false);
     }
     
     public static void LoadNetWork(string targetScene)
@@ -51,5 +57,29 @@ public class LobbyUI : MonoBehaviour
         {
             GeneralManager.Instance.SetPlayername(newText);
         });
+        
+        NetworkLobby.Instance.OnLobbyListChanged += InstanceOnOnLobbyListChanged;
+        UpdateLobbyList(new List<Lobby>());
+    }
+
+    private void InstanceOnOnLobbyListChanged(object sender, NetworkLobby.OnLobbyListChagnedEventArgs e)
+    {
+        UpdateLobbyList(e.lobbyList);
+    }
+
+    private void UpdateLobbyList(List<Lobby> lobbyList)
+    {
+        foreach (Transform child in _lobbyContainter)
+        {
+            if(child == _lobbyTemplate) continue;
+            Destroy(child.gameObject);
+        }
+
+        foreach (Lobby lobby in lobbyList)
+        {
+            Transform lobbyTransform = Instantiate(_lobbyTemplate, _lobbyContainter);
+            lobbyTransform.gameObject.SetActive(true);
+            lobbyTransform.GetComponent<LobbyListSingleUI>().SetLobby(lobby);
+        }
     }
 }

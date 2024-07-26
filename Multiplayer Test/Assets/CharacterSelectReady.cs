@@ -43,6 +43,8 @@ public class CharacterSelectReady : NetworkBehaviour
 
         if (allClientsReady)
         {
+            //This is if I want to delete the lobby after it has been made
+            NetworkLobby.Instance.DestroyLobby();
             NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
         }
     }

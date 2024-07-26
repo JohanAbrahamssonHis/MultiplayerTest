@@ -4,15 +4,11 @@ using Unity.Netcode;
 
 public class NetworkManagerSetup : MonoBehaviour
 {
-    public NetworkManager networkManager;
-    public SteamP2PTransport steamP2PTransport;
-
-    void Start()
+    void Awake()
     {
-        // Assign the SteamP2PTransport to the NetworkManager
-        networkManager.NetworkConfig.NetworkTransport = steamP2PTransport;
-
-        // Start the server or client based on your requirement
-        //networkManager.StartServer(); // or networkManager.StartClient();
+        if (NetworkManager.Singleton != null)
+        {
+            Destroy(gameObject);
+        }
     }
 }
