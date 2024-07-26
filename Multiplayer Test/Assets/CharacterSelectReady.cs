@@ -55,13 +55,8 @@ public class CharacterSelectReady : NetworkBehaviour
         OnReadyChange?.Invoke(this,EventArgs.Empty);
     }
 
-    public List<bool> GetPlayersReady()
-    {
-        return playerReadyDictionary.Values.ToList();
-    }
-
     public bool IsPlayerReady(ulong clientId)
     {
-        return playerReadyDictionary[clientId];
+        return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }
 }

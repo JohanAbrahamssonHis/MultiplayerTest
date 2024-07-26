@@ -32,12 +32,44 @@ public class GeneralManager : NetworkBehaviour
     public void StartHost()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManagerOnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += SingletonOnOnClientDisconnectCallback;
         NetworkManager.Singleton.StartHost();
+    }
+
+    private void SingletonOnOnClientDisconnectCallback(ulong clientId)
+    {
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            PlayerData playerData = playerDataNetworkList[i];
+            if (playerData.clientId == clientId)
+            {
+                 //Disconnected
+                 playerDataNetworkList.RemoveAt(i);
+            }
+        }
     }
 
     public void StartClient()
     {
+        NetworkManager.Singleton.OnClientConnectedCallback += SingletonOnOnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
+    }
+
+    private void SingletonOnOnClientConnectedCallback(ulong clientId)
+    {
+        SetPlayerNameServerRpc(GetPlayername());
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerName = playerName;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
 
     private void NetworkManagerOnClientConnectedCallback(ulong clientId)
@@ -46,6 +78,7 @@ public class GeneralManager : NetworkBehaviour
         {
             clientId = clientId,
         });
+        SetPlayerNameServerRpc(GetPlayername());
     }
 
     public string GetPlayername()
@@ -63,5 +96,41 @@ public class GeneralManager : NetworkBehaviour
     public bool IsPlayerIndexConnected(int playerIndex)
     {
         return playerIndex < playerDataNetworkList.Count;
+    }
+
+    public int GetPlayerDataIndexFromClientId(ulong clientId)
+    {
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            if (playerDataNetworkList[i].clientId == clientId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    
+    public PlayerData GetPlayerDataFromClientId(ulong clientId)
+    {
+        foreach (var playerData in playerDataNetworkList)
+        {
+            if (playerData.clientId == clientId)
+            {
+                return playerData;
+            }
+        }
+
+        return default;
+    }
+
+    public PlayerData GetPlayerData()
+    {
+        return GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
+    }
+    
+    public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex)
+    {
+        return playerDataNetworkList[playerIndex];
     }
 }

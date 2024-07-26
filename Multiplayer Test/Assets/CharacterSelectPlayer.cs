@@ -8,11 +8,18 @@ public class CharacterSelectPlayer : MonoBehaviour
 {
     [SerializeField] private int index;
     [SerializeField] private TextMeshProUGUI ready;
+    [SerializeField] private TextMeshProUGUI name;
     
     private void Start()
     {
         GeneralManager.Instance.OnPlayerDataNetworkListChanged += OnPlayerDataNetworkListChanged;
+        CharacterSelectReady.Instance.OnReadyChange += InstanceOnOnReadyChange;
         
+        UpdatePlayer();
+    }
+
+    private void InstanceOnOnReadyChange(object sender, EventArgs e)
+    {
         UpdatePlayer();
     }
 
@@ -26,6 +33,12 @@ public class CharacterSelectPlayer : MonoBehaviour
         if (GeneralManager.Instance.IsPlayerIndexConnected(index))
         {
             Show();
+
+            PlayerData playerData = GeneralManager.Instance.GetPlayerDataFromPlayerIndex(index);
+            ready.text = CharacterSelectReady.Instance.IsPlayerReady(playerData.clientId) ? "Ready" : "Unready";
+
+            name.text = playerData.playerName.ToString();
+
         }
         else
         {
