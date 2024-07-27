@@ -7,6 +7,7 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class NetworkLobby : MonoBehaviour
@@ -45,7 +46,11 @@ public class NetworkLobby : MonoBehaviour
 
     private void HandlePeriodicListLobbies()
     {
-        if(joinedLobby != null && !AuthenticationService.Instance.IsSignedIn) return;
+        if(joinedLobby != null && 
+           !AuthenticationService.Instance.IsSignedIn &&
+           SceneManager.GetActiveScene().name != "Lobby Scene") return;
+        
+        
         listLobbiesTimer -= Time.deltaTime;
         if (listLobbiesTimer <= 0f)
         {
