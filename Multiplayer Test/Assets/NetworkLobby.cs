@@ -1,17 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class NetworkLobby : MonoBehaviour
 {
+    private const string KEY_RELAY_JOIN_CODE = "RelayJoinCode";
     public static NetworkLobby Instance { get; private set; }
 
     public event EventHandler<OnLobbyListChagnedEventArgs> OnLobbyListChanged; 
@@ -119,6 +126,51 @@ public class NetworkLobby : MonoBehaviour
         }
     }
 
+    private async Task<Allocation> AllocateRelay()
+    {
+        try
+        {
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(4);
+            
+            return allocation;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+
+            return default;
+        }
+    }
+
+    private async Task<string> GetRelayJoinCode(Allocation allocation)
+    {
+        try
+        {
+            string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            return relayJoinCode;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            return default;
+        }
+    }
+
+    private async Task<JoinAllocation> JoinRelay(string joinCode)
+    {
+        try
+        {
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            return joinAllocation;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            return default;
+        }
+    }
+    
     public async void CreateLobby(string lobbyName, bool isPrivate)
     {
         try
@@ -127,6 +179,20 @@ public class NetworkLobby : MonoBehaviour
             {
                 IsPrivate = isPrivate,
             });
+
+            Allocation allocation = await AllocateRelay();
+
+            string relayJoinCode = await GetRelayJoinCode(allocation);
+
+            await LobbyService.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>
+                {
+                    {KEY_RELAY_JOIN_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayJoinCode)}
+                }
+            });
+            
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
             
             GeneralManager.Instance.StartHost();
             TestingLobbyUI.LoadNetWork("Character Select Scene");
@@ -197,6 +263,13 @@ public class NetworkLobby : MonoBehaviour
         try
         {
             joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
+
+            string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
+            
+            JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
+            
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+            
             GeneralManager.Instance.StartClient();
         }
         catch (Exception e)
@@ -211,6 +284,13 @@ public class NetworkLobby : MonoBehaviour
         try
         {
             joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            
+            string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
+            
+            JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
+            
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+
             GeneralManager.Instance.StartClient();
         }
         catch (Exception e)
@@ -225,6 +305,13 @@ public class NetworkLobby : MonoBehaviour
         try
         {
             joinedLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
+            
+            string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
+            
+            JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
+            
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+            
             GeneralManager.Instance.StartClient();
         }
         catch (Exception e)
