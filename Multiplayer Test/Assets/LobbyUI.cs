@@ -27,7 +27,7 @@ public class LobbyUI : MonoBehaviour
         mainMenuButton.onClick.AddListener((() =>
         {
             NetworkLobby.Instance.LeaveLobby();
-            LoadNetWork("Character Select Scene");
+            SceneManager.LoadScene("MainMenu");
         }));
         createLobbyButton.onClick.AddListener((() =>
         {

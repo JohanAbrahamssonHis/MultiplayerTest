@@ -16,15 +16,19 @@ public class GeneralManager : NetworkBehaviour
     
     private void Awake()
     {
+        
+        DontDestroyOnLoad(gameObject);
+        /*
         if (Instance != null)
         {
             Destroy(gameObject);
         }
+        */
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkListOnOnListChanged;
-        playerName = SteamManager.Initialized ? SteamFriends.GetPersonaName() : PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName" + UnityEngine.Random.Range(100,10000));
+        playerName = SteamManager.Initialized ? SteamFriends.GetPersonaName() :  PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName" + UnityEngine.Random.Range(100,1000));
     }
 
     private void PlayerDataNetworkListOnOnListChanged(NetworkListEvent<PlayerData> changeEvent)

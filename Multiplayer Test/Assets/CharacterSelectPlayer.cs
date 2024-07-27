@@ -46,6 +46,12 @@ public class CharacterSelectPlayer : MonoBehaviour
         }
     }
 
+    public void OnDestroy()
+    {
+        GeneralManager.Instance.OnPlayerDataNetworkListChanged -= OnPlayerDataNetworkListChanged;
+        CharacterSelectReady.Instance.OnReadyChange -= InstanceOnOnReadyChange;
+    }
+
     private void Show()
     {
         gameObject.SetActive(true);

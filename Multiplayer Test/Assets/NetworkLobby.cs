@@ -34,13 +34,11 @@ public class NetworkLobby : MonoBehaviour
     
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-        }
+        DontDestroyOnLoad(gameObject);
+        
         Instance = this;
         
-        DontDestroyOnLoad(gameObject);
+        
         
         InitializeUnityAuthentication();
     }
@@ -195,13 +193,15 @@ public class NetworkLobby : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
             
             GeneralManager.Instance.StartHost();
-            TestingLobbyUI.LoadNetWork("Character Select Scene");
+            LobbyUI.LoadNetWork("Character Select Scene");
         }
+        
         catch (Exception e)
         {
             Debug.Log(e);
             throw;
         }
+        
     }
 
     public async void DestroyLobby()
